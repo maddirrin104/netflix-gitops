@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: netflix-managed-cert
+spec:
+  domains:
+    - netflix-sitdog05.duckdns.org

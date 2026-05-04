@@ -1,21 +1,21 @@
-alertmanager:
-  config:
-    global:
-      smtp_smarthost: 'smtp.gmail.com:587'
-      smtp_from: 'YOUR_GMAIL@gmail.com'
-      smtp_auth_username: 'YOUR_GMAIL@gmail.com'
-      smtp_auth_password: 'YOUR_APP_PASSWORD'
-      smtp_require_tls: true
+global:
+  resolve_timeout: 5m
 
-    route:
-      receiver: gmail-notify
-      group_by: ['alertname']
-      group_wait: 10s
-      group_interval: 30s
-      repeat_interval: 5m
+route:
+  receiver: telegram-notify
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 5m
 
-    receivers:
-      - name: gmail-notify
-        email_configs:
-          - to: 'YOUR_RECEIVER_EMAIL@gmail.com'
-            send_resolved: true
+receivers:
+  - name: telegram-notify
+    telegram_configs:
+      - bot_token: 'TOKEN_BOT'
+        chat_id: 'chat_id'
+        parse_mode: HTML
+        message: |
+          🚨 <b>{{ .CommonLabels.alertname }}</b>
+          Severity: {{ .CommonLabels.severity }}
+          Summary: {{ .CommonAnnotations.summary }}
+          Description: {{ .CommonAnnotations.description }}

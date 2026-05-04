@@ -1,0 +1,21 @@
+alertmanager:
+  config:
+    global:
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'YOUR_GMAIL@gmail.com'
+      smtp_auth_username: 'YOUR_GMAIL@gmail.com'
+      smtp_auth_password: 'YOUR_APP_PASSWORD'
+      smtp_require_tls: true
+
+    route:
+      receiver: gmail-notify
+      group_by: ['alertname']
+      group_wait: 10s
+      group_interval: 30s
+      repeat_interval: 5m
+
+    receivers:
+      - name: gmail-notify
+        email_configs:
+          - to: 'YOUR_RECEIVER_EMAIL@gmail.com'
+            send_resolved: true

@@ -1,0 +1,55 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: netflix-alert-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: netflix.rules
+      rules:
+        - alert: NetflixAppDown
+          expr: kube_deployment_status_replicas_available{namespace="default", deployment="netflix-app"} < 1
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Netflix app is down"
+            description: "Deployment netflix-app has no available replicas."
+
+        - alert: NetflixReplicasMismatch
+          expr: kube_deployment_status_replicas_available{namespace="default", deployment="netflix-app"} < kube_deployment_spec_replicas{namespace="default", deployment="netflix-app"}
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Netflix replicas are not fully available"
+            description: "Available replicas are lower than desired replicas."
+
+        - alert: NetflixPodRestarting
+          expr: increase(kube_pod_container_status_restarts_total{namespace="default", pod=~"netflix-app.*"}[5m]) > 0
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Netflix pod restarted"
+            description: "A Netflix app pod restarted in the last 5 minutes."
+
+        - alert: NetflixHighCPU
+          expr: sum(rate(container_cpu_usage_seconds_total{namespace="default", pod=~"netflix-app.*", container!="", container!="POD"}[5m])) > 0.5
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Netflix app CPU usage is high"
+            description: "Netflix app CPU usage is above 0.5 CPU cores for 2 minutes."
+
+        - alert: NetflixHighMemory
+          expr: sum(container_memory_working_set_bytes{namespace="default", pod=~"netflix-app.*", container!="", container!="POD"}) > 500000000
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Netflix app memory usage is high"
+            description: "Netflix app memory usage is above 500MB for 2 minutes."

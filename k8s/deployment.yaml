@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: netflix
-          image: maddirrin104/netflix-clone-react-typescript:9f350b39ed5a80a284103e58001742868a545ed2
+          image: maddirrin104/netflix-clone-react-typescript:988c79d1331c0d7dfe3471633f38b9542605d694
           ports:
             - containerPort: 80
